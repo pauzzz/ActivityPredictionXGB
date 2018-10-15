@@ -3,18 +3,39 @@ import xgboost as xgb
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
 from xgboost.sklearn import XGBClassifier
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+from ggplot import *
+import numpy as np
 
 xtrain=pd.read_csv('train/X_train.csv', sep=' ', header=None)
 ytrain=pd.read_csv('train/Y_train.csv', header=None)
 
-xtrain.shape
-ytrain.shape
+print(xtrain.shape)
+print(xtrain.describe())
+print(ytrain.shape)
 
 xtest=pd.read_csv('test/X_test.csv', sep=' ', header=None)
 ytest=pd.read_csv('test/Y_test.csv', header=None)
 
-xtest.shape
-ytest.shape
+print(xtest.shape)
+print(ytest.shape)
+#TSNE and data vis
+samples=pd.concat([xtrain,ytrain],axis=1)
+tsne=TSNE(learning_rate=100)
+transformed=tsne.fit_transform(samples)
+xs=transformed[:,0]
+ys=transformed[:,1]
+
+arr=ytrain[0].tolist()
+#arr=np.array(list(map(lambda x: d[x], arr)))
+plt.figure(figsize=(12, 9))
+# Put a nicer background color on the legend.
+fig=plt.scatter(xs, ys, alpha=0.4, cmap=plt.cm.get_cmap("tab20", 12), c=arr)
+#plt.legend(handles=[arr],bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+cbar=plt.colorbar(label='Activity Type')
+fig.figure.savefig('TSNE.png', dpi=600)
+fig.figure.show()
 
 #compare general non optimized params to optimized params
 
@@ -86,6 +107,7 @@ print('Accuracy using softmax = {}'.format(1-error_rate))
 
 #predicteds are 90.51% accurate.
 
+#October 4 new addition: Use keras and neural networks
 
 
 
@@ -94,12 +116,4 @@ print('Accuracy using softmax = {}'.format(1-error_rate))
 
 
 
-#label_dict={1:'WALKING',
-#2:'WALKING_UPSTAIRS',
-#3:'WALKING_DOWNSTAIRS',
-#4:'SITTING',
-#5:'STANDING',
-#6:'LAYING'
-#}
-#
-#data['labels']=data['rawlabel'].map(label_dict)
+
